@@ -180,8 +180,8 @@ if __name__ == "__main__":
     parser.add_argument('--embed-path', type=str, default=None)
     parser.add_argument('--mean-pooling', action="store_true")
     parser.add_argument('--early-layer', action="store_true")
-    parser.add_argument('--data', type=str, default="wmdp_bio_percent1")
-    parser.add_argument('--retain-data', type=str, default="wikitext_train ")
+    parser.add_argument('--data', type=str, default="wmdp_bio")
+    parser.add_argument('--retain-data', type=str, default="wikitext_train")
     parser.add_argument('--tokenize', type=str, default='sentence_improved')
     parser.add_argument('--num-samples', type=int, default=1e8)
     parser.add_argument('--max-sents', type=int, default=-1)
@@ -270,7 +270,7 @@ if __name__ == "__main__":
     if arg.ll_percentile > 0 or arg.ll_inc_percentile > 0:
         ll_metrics_file = os.path.join(ckpt_prefix, f"{arg.original_model.split('/')[-1]}_{arg.data}_{arg.retain_data}_ll_changes.json")
         if not os.path.exists(ll_metrics_file):
-            print("Computing log-likelihood and its change...")
+            print(f"Computing log-likelihood and its change... (will be saved to {ll_metrics_file})")
             compute_ppl_change(original_model, finetune_model, tokenizer, arg.data, None, arg.tokenize, save_name=ll_metrics_file)
             print(f"Computed and saved log-likelihood to {ll_metrics_file}")
 
@@ -333,8 +333,7 @@ if __name__ == "__main__":
             final_idx = -1
         else:
             # Compute perplexity changes for filtering
-            ppl_change_res = compute_ppl_change(original_model, finetune_model, None, tokenizer, sents[1:], sent_dataset=True, change_device=False)
-            
+            ppl_change_res = compute_ppl_change(original_model, finetune_model, tokenizer, sents[1:], sent_dataset=True)
             # Check likelihood threshold (G3)
             if thresholds[0] is not None:
                 sur_original_lls = np.array(ppl_change_res["unlearn_original_ll"])
@@ -399,15 +398,15 @@ if __name__ == "__main__":
         if appended:
             print(f"\n{i} ({len(modified_dataset)} / {arg.num_needed})")
 
-        # Save progress
-        with open(json_filename, 'w') as f:
-            json.dump(modified_dataset, f)
+            # Save progress
+            with open(json_filename, 'w') as f:
+                json.dump(modified_dataset, f)
 
-        # Check if target number reached
-        if arg.num_needed > 0 and len(modified_dataset) >= arg.num_needed:
-            print(f"Reached desired number of sentences ({len(modified_dataset)}/{arg.num_needed}). Stopping.")
-            print(f"Surrogate dataset saved to {json_filename}")
-            break
+            # Check if target number reached
+            if arg.num_needed > 0 and len(modified_dataset) >= arg.num_needed:
+                print(f"Reached desired number of sentences ({len(modified_dataset)}/{arg.num_needed}). Stopping.")
+                print(f"Surrogate dataset saved to {json_filename}")
+                break
 
     print(f"Surrogate dataset generation complete!")
     print(f"Generated {len(modified_dataset)} sentences")

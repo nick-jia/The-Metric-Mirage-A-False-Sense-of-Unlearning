@@ -25,19 +25,7 @@ def embedding_loss_fn(model, inputs, target_labels, loss_slice, negative_embeddi
         original_embedding=original_embedding
     )
 
-    # Fluency penalty based on logit distribution (no specific target)
-    logits = outputs.logits[:, :-1, :]  # Predict next tokens
-    probs = F.softmax(logits, dim=-1)
-
-    if config['fluency_penalty'] > 0:
-        # Measure entropy or max probability to encourage fluency
-        entropy = - torch.sum(probs * torch.log(probs + 1e-10), dim=-1).mean()
-        fluency_penalty = config['fluency_penalty'] * entropy
-        total_loss = embedding_score + fluency_penalty
-    else:
-        total_loss = embedding_score
-
-    return total_loss
+    return embedding_score
 
 
 def prep_text_for_embedding_loss(input_str, model, tokenizer, device, num_free_tokens=10, system_prompt="", chat_template=["Rephrase the following: ", " Rephrased version:"], adv_suffix=False, adv_prefix=False):

@@ -223,6 +223,9 @@ def obtain_sentence_dataset(dataset_name, save_path=None, return_save_path=False
             data_name = dataset_name
         if not os.path.exists(data_name):
             save_path = f"data/dataset_{mode}/{data_name}_{mode}"
+            if not os.path.exists(f"data/dataset_{mode}"):
+                os.makedirs("data", exist_ok=True)
+                os.makedirs(f"data/dataset_{mode}")
         else:
             print("dataset itself is a file and save_path is not set, so will not save another file")
 

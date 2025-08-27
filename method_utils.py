@@ -59,7 +59,7 @@ def get_token_scores(model, input_ids, ll=True, embed=False):
 
 def compute_embedding_distances(current_embedding, negative_embeddings, positive_embeddings, config,
                                 original_embedding=None):
-    snnl_loss = SNNLCrossEntropy(temperature=config["snnl_temp"], cos_distance=True)
+    snnl_loss = SNNLCrossEntropy()
     batch_size = min(config["embedding_batch_size"], negative_embeddings.shape[0])
     ref_idx = torch.randperm(negative_embeddings.shape[0])[:batch_size]
     if original_embedding is not None:
