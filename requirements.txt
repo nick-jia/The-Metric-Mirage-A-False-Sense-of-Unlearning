@@ -1,0 +1,10 @@
+# Essential dependencies for LLM Concept Unlearning
+numpy
+pandas
+torch
+transformers
+datasets
+accelerate
+huggingface_hub
+peft
+sentence_transformers
